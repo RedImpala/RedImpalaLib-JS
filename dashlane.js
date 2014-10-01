@@ -1,8 +1,10 @@
 var crypto = require('crypto');
 var zlib = require('zlib');
+var url = require('url');
+var http = require('https');
+var querystring = require('querystring');
 var through = require('through2');
 var util = require('./util');
-var request = require('request');
 
 var CONFIG = {
   "SEND_TOKEN": 'https://ws1.dashlane.com/6/authentication/sendtoken',
@@ -71,20 +73,52 @@ var getFullBackup = module.exports.getFullBackup = function(options, callback) {
     form.token = options.token;
   else
     return callback(new Error("No login provided"));
-  request.post(CONFIG.GET_LATEST_BACKUP, { form: form }, function(err, resp, body) {
-    if (err) return callback(err);
-    var file = new Buffer(JSON.parse(body).fullBackupFile, 'base64');
-    decrypt(file, options.password, callback);
+  var opts = url.parse(CONFIG.GET_LATEST_BACKUP);
+  opts.method = 'POST';
+  var req = http.request(opts, function(res) {
+    var chunks = [];
+    var bodylen = 0;
+    res.on('error', function(err) {
+      return callback(err);
+    });
+    res.on('data', function(chunk) {
+      chunks.push(chunk);
+      bodylen += chunk.length;
+    });
+    res.on('end', function() {
+      var body = Buffer.concat(chunks, bodylen);
+      var file = new Buffer(JSON.parse(body).fullBackupFile, 'base64');
+      decrypt(file, options.password, callback);
+    })
   });
+  req.on('error', function(err) {
+    return callback(err);
+  });
+  req.write(querystring.stringify(form));
+  req.end();
 };
 
 var sendToken = module.exports.sendToken = function(email, callback) {
-  request.post(CONFIG.SEND_TOKEN, {
-    form: {
-      login: email,
-    }
-  }, function(err, resp, body) {
-    if (err) return callback(err);
-    else return callback(null, body); // TODO : Check if body == 'OK'
+  var form = { login: email };
+  var opts = url.parse(CONFIG.SEND_TOKEN);
+  opts.method = 'POST';
+  var req = http.request(opts, function(res) {
+    var chunks = [];
+    var bodylen = 0;
+    res.on('error', function(err) {
+      return callback(err);
+    });
+    res.on('data', function(chunk) {
+      chunks.push(chunk);
+      bodylen += chunk.length;
+    });
+    res.on('end', function() {
+      return callback(null, Buffer.concat(chunks, bodylen).toString());
+    });
   });
+  req.on('error', function(err) {
+    return callback(err);
+  });
+  req.write(querystring.stringify(form));
+  req.end();
 };

@@ -1,6 +1,6 @@
 {
   "name": "RedImpalaLib",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Easily interact with Dashlane's secure data",
   "main": "dashlane.js",
   "scripts": {
@@ -21,7 +21,6 @@
   },
   "homepage": "https://github.com/RedImpala/RedImpalaLib-JS",
   "dependencies": {
-    "request": "^2.44.0",
     "through2": "^0.6.2"
   }
 }
