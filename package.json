@@ -1,0 +1,27 @@
+{
+  "name": "RedImpalaLib",
+  "version": "1.0.0",
+  "description": "Easily interact with Dashlane's secure data",
+  "main": "dashlane.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RedImpala/RedImpalaLib-JS.git"
+  },
+  "keywords": [
+    "dashlane",
+    "password"
+  ],
+  "author": "roblabla",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/RedImpala/RedImpalaLib-JS/issues"
+  },
+  "homepage": "https://github.com/RedImpala/RedImpalaLib-JS",
+  "dependencies": {
+    "request": "^2.44.0",
+    "through2": "^0.6.2"
+  }
+}
