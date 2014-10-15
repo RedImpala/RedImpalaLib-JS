@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/RedImpala/RedImpalaLib-JS",
   "dependencies": {
-    "through2": "^0.6.2"
+    "through2": "^0.6.2",
+    "uuid": "^2.0.1"
   }
 }

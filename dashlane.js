@@ -4,11 +4,14 @@ var url = require('url');
 var http = require('https');
 var querystring = require('querystring');
 var through = require('through2');
+var uuid = require('uuid');
+var os = require('os');
 var util = require('./util');
 
 var CONFIG = {
   "SEND_TOKEN": 'https://ws1.dashlane.com/6/authentication/sendtoken',
-  "GET_LATEST_BACKUP": 'https://ws1.dashlane.com/12/backup/latest'
+  "GET_LATEST_BACKUP": 'https://ws1.dashlane.com/12/backup/latest',
+  "REGISTER_UKI": 'https://ws1.dashlane.com/6/authentication/registeruki'
 };
 
 var decrypt = module.exports.decrypt = function (file, password, callback) {
@@ -120,5 +123,33 @@ var sendToken = module.exports.sendToken = function(email, callback) {
     return callback(err);
   });
   req.write(querystring.stringify(form));
+  req.end();
+};
+
+var registerUKI = module.exports.registerUKI = function(options, callback) {
+  options.uki = crypto.createHash('md5').update(uuid.v1()).digest('hex') + '-webaccess-' + Date.now();
+  options.deviceName = "RedImpala-" + os.hostname();
+  options.platform = "RedImpala"; // Maybe os.platform() ?
+  options.temporary = 0;
+  var opts = url.parse(CONFIG.REGISTER_UKI);
+  opts.method = 'POST';
+  var req = http.request(opts, function(res) {
+    var chunks = [];
+    var bodylen = 0;
+    res.on('error', function(err) {
+      return callback(err);
+    });
+    res.on('data', function(chunk) {
+      chunks.push(chunk);
+      bodylen += chunk.length;
+    });
+    res.on('end', function() {
+      return callback(null, options.uki, Buffer.concat(chunks, bodylen).toString());
+    });
+  });
+  req.on('error', function(err) {
+    return callback(err);
+  });
+  req.write(querystring.stringify(options));
   req.end();
 };
