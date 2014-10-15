@@ -6,6 +6,8 @@ var querystring = require('querystring');
 var through = require('through2');
 var uuid = require('uuid');
 var os = require('os');
+var DOMParser = require('xmldom').DOMParser;
+var xpath = require('xpath');
 var util = require('./util');
 
 var CONFIG = {
@@ -55,7 +57,7 @@ var decrypt = module.exports.decrypt = function (file, password, callback) {
       bufslen += chunk.length;
     });
     out.on('end', function() {
-      callback(null, Buffer.concat(bufs, bufslen));
+      callback(null, Buffer.concat(bufs, bufslen).toString());
     });
     decipher.end(aes);
   });
@@ -152,4 +154,13 @@ var registerUKI = module.exports.registerUKI = function(options, callback) {
   });
   req.write(querystring.stringify(options));
   req.end();
+};
+
+var getPassword = module.exports.getPassword = function(file, name, callback) {
+  var dom = new DOMParser().parseFromString(file);
+  var val = xpath.select('/root/KWDataList/KWAuthentifiant[*[@key="Title"]/text()="' + name + '"]/*[@key="Password"]/text()', dom);
+  if (val.length > 0)
+    return callback(null, val[0].data);
+  else
+    return callback(null, null);
 };
