@@ -1,6 +1,8 @@
 RedImpalaLib-JS
 ============
 
+[![Gitter chat](https://badges.gitter.im/RedImpala/chat.png)](https://gitter.im/RedImpala/chat)
+
 A library to easily interact with Dashlane's secure data.
 
 *NOTE* : This library is still extremely experimental. The idea is to be able
