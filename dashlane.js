@@ -26,7 +26,7 @@ var decrypt = module.exports.decrypt = function (file, password, callback) {
     compressed = false;
     var aes = file.slice(32);
   }
-  crypto.pbkdf2(password, salt, 10204, 32, function(err, key) {
+  crypto.pbkdf2(password, salt, 10204, 32, "sha1", function(err, key) {
     if (err) return callback(err);
     var tmp = util.BytesToKey(key, salt.slice(0, 8), 1);
     var iv = tmp.iv;
